@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Civic Platform - Citizen Portal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="/shared/css/base.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  .upload-box { border: 2px dashed var(--color-border); border-radius: var(--radius); padding: 24px; text-align: center; cursor: pointer; }
+  .upload-box img { max-width: 100%; max-height: 220px; border-radius: 8px; }
+  .result-banner { padding: 14px 16px; border-radius: 10px; margin-bottom: 16px; font-size: 14px; }
+  .result-banner.verified { background: #dff5e6; color: #1f9d55; }
+  .result-banner.unverified { background: #fbe2e6; color: #d6334a; }
+  .result-banner.no_metadata { background: #fdecd9; color: #d97b18; }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <div class="sidebar">
+    <div class="brand">🏛️ CivicConnect <small>Citizen Portal</small></div>
+    <div id="navItems"></div>
+    <div class="footer-link" onclick="logout('/user/login.html')">⏻ Log out</div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <h1 id="pageTitle">Dashboard</h1>
+      <div class="user-chip">
+        <span id="pointsPill" class="points-pill">0 pts</span>
+        <span id="userName"></span>
+      </div>
+    </div>
+
+    <!-- DASHBOARD TAB -->
+    <div data-tab="dashboard" class="tab-panel">
+      <div class="grid grid-4" id="dashStats"></div>
+      <div class="card" style="margin-top:18px;">
+        <h3>Recent Reports</h3>
+        <div id="dashRecent"></div>
+      </div>
+    </div>
+
+    <!-- REPORT TAB -->
+    <div data-tab="report" class="tab-panel" style="display:none;">
+      <div class="card" style="max-width:640px;">
+        <div class="field">
+          <label>Photo of the Issue</label>
+          <div class="upload-box" onclick="document.getElementById('fileInput').click()">
+            <div id="uploadPlaceholder">📷 Click to upload a photo (the AI will analyze it)</div>
+            <img id="previewImg" style="display:none;" />
+          </div>
+          <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="onFileSelected(event)" />
+        </div>
+        <div class="field"><label>Title</label><input class="input" id="titleInput" /></div>
+        <div class="field"><label>Description</label><textarea class="input" id="descInput" rows="3"></textarea></div>
+        <div class="field"><label>Address of the Issue</label><input class="input" id="addressInput" placeholder="e.g. 12 MG Road, Bengaluru" /></div>
+        <button class="btn" id="submitBtn" onclick="submitIssue()">Analyze & Submit Report</button>
+        <div id="reportResult" style="margin-top:16px;"></div>
+      </div>
+    </div>
+
+    <!-- MY ISSUES TAB -->
+    <div data-tab="my_issues" class="tab-panel" style="display:none;">
+      <div id="myIssuesList"></div>
+    </div>
+
+    <!-- NEARBY TAB -->
+    <div data-tab="nearby" class="tab-panel" style="display:none;">
+      <div class="card">
+        <div id="map"></div>
+      </div>
+      <div id="nearbyList" style="margin-top:14px;"></div>
+    </div>
+
+    <!-- LEADERBOARD TAB -->
+    <div data-tab="leaderboard" class="tab-panel" style="display:none;">
+      <div class="card">
+        <table>
+          <thead><tr><th>#</th><th>Citizen</th><th>Points</th><th>Reports</th><th>Badges</th></tr></thead>
+          <tbody id="leaderboardBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PROFILE TAB -->
+    <div data-tab="profile" class="tab-panel" style="display:none;">
+      <div class="card" style="max-width:480px;">
+        <h3 id="profileName"></h3>
+        <p id="profileEmail" style="color:var(--color-text-muted);"></p>
+        <div class="grid grid-2" style="margin-top:12px;">
+          <div class="stat-card"><div class="value" id="profilePoints">0</div><div class="label">Points</div></div>
+          <div class="stat-card"><div class="value" id="profileReports">0</div><div class="label">Reports Filed</div></div>
+        </div>
+        <h4 style="margin-top:18px;">Badges</h4>
+        <div id="profileBadges"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/shared/js/api.js"></script>
+<script src="/user/js/app.js"></script>
+</body>
+</html>

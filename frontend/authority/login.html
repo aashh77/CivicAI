@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Civic Platform - Authority Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="/shared/css/base.css" />
+</head>
+<body>
+<div class="auth-page" style="background:linear-gradient(135deg,#1f9d55,#141a2e);">
+  <div class="auth-card">
+    <h2>🛠️ Authority Login</h2>
+    <p style="color:#6b7385;font-size:13.5px;margin-top:-8px;">Department staff access only. Accounts are created by an administrator.</p>
+    <div class="field"><label>Email</label><input class="input" id="email" type="email" /></div>
+    <div class="field"><label>Password</label><input class="input" id="password" type="password" /></div>
+    <button class="btn" style="width:100%;justify-content:center;background:#1f9d55;" onclick="doLogin()">Log In</button>
+    <div class="switch"><a href="/user/login.html">← Citizen login</a></div>
+  </div>
+</div>
+<script src="/shared/js/api.js"></script>
+<script>
+async function doLogin() {
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  if (!email || !password) return alert('Enter email and password');
+  try {
+    const data = await Api.post('/api/auth/login', { email, password });
+    if (data.user.role !== 'authority') return alert('This account is not an authority account.');
+    Api.setToken(data.token);
+    Api.setUser(data.user);
+    window.location.href = '/authority/index.html';
+  } catch (err) {
+    alert(err.message);
+  }
+}
+document.addEventListener('keydown', (e) => { if (e.key === 'Enter') doLogin(); });
+</script>
+</body>
+</html>

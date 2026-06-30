@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Civic Platform - Admin Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="/shared/css/base.css" />
+</head>
+<body>
+<div class="auth-page">
+  <div class="auth-card">
+    <h2>🏛️ Admin Console</h2>
+    <p style="color:#6b7385;font-size:13.5px;margin-top:-8px;">Platform administration access</p>
+    <div class="field"><label>Email</label><input class="input" id="email" type="email" /></div>
+    <div class="field"><label>Password</label><input class="input" id="password" type="password" /></div>
+    <button class="btn" style="width:100%;justify-content:center;" onclick="doLogin()">Log In</button>
+    <p style="font-size:12px;color:var(--color-text-muted);margin-top:14px;">Default bootstrap credentials are set via BOOTSTRAP_ADMIN_EMAIL / BOOTSTRAP_ADMIN_PASSWORD in your .env file.</p>
+  </div>
+</div>
+<script src="/shared/js/api.js"></script>
+<script>
+async function doLogin() {
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  if (!email || !password) return alert('Enter email and password');
+  try {
+    const data = await Api.post('/api/auth/login', { email, password });
+    if (data.user.role !== 'admin') return alert('This account is not an admin account.');
+    Api.setToken(data.token);
+    Api.setUser(data.user);
+    window.location.href = '/admin/index.html';
+  } catch (err) {
+    alert(err.message);
+  }
+}
+document.addEventListener('keydown', (e) => { if (e.key === 'Enter') doLogin(); });
+</script>
+</body>
+</html>

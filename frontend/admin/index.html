@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Civic Platform - Admin Console</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<link rel="stylesheet" href="/shared/css/base.css" />
+<style>
+  .modal-overlay { position: fixed; inset:0; background:rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; z-index: 50; }
+  .modal { background:#fff; border-radius: var(--radius); padding:22px; width: 440px; max-width:90vw; }
+  .portal-link-card { display:flex; align-items:center; justify-content:space-between; }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <div class="sidebar">
+    <div class="brand">🏛️ CivicConnect <small>Admin Console</small></div>
+    <div class="nav-item active" id="nav-dashboard" onclick="showTab('dashboard')"><span>📊</span> Dashboard</div>
+    <div class="nav-item" id="nav-issues" onclick="showTab('issues')"><span>📋</span> All Issues</div>
+    <div class="nav-item" id="nav-map" onclick="showTab('map')"><span>🗺️</span> Issue Map</div> 
+    <div class="nav-item" id="nav-users" onclick="showTab('users')"><span>👥</span> Users & Authorities</div>
+    <div class="nav-item" id="nav-customize" onclick="showTab('customize')"><span>🎛️</span> Customize Portals</div>
+    <div class="nav-item" id="nav-portals" onclick="showTab('portals')"><span>🔗</span> Open Portals</div>
+    <div class="footer-link" onclick="logout('/admin/login.html')">⏻ Log out</div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <h1 id="pageTitle">Dashboard</h1>
+      <div class="user-chip"><span id="userName"></span></div>
+    </div>
+
+    <div data-tab="dashboard" class="tab-panel">
+      <div class="grid grid-4" id="dashStats"></div>
+      <div class="card" style="margin-top:18px;">
+        <h3>Issues by Department</h3>
+        <div id="deptBreakdown"></div>
+      </div>
+    </div>
+
+    <div data-tab="issues" class="tab-panel" style="display:none;">
+      <div class="card" style="margin-bottom:14px;display:flex;gap:10px;align-items:end;flex-wrap:wrap;">
+        <div class="field" style="margin-bottom:0;min-width:160px;">
+          <label>Status</label>
+          <select id="filterStatus" class="input" onchange="loadAllIssues()">
+            <option value="">All</option>
+            <option value="assigned">Assigned</option>
+            <option value="in_progress">In Progress</option>
+            <option value="resolved">Resolved</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+        <div class="field" style="margin-bottom:0;min-width:200px;">
+          <label>Department</label>
+          <select id="filterDept" class="input" onchange="loadAllIssues()"><option value="">All</option></select>
+        </div>
+      </div>
+      <div id="adminIssueList"></div>
+    </div>
+
+    <div data-tab="map" class="tab-panel" style="display:none;">
+      <div class="card" style="padding: 12px; height: calc(100vh - 140px); min-height: 500px; display: flex; flex-direction: column;">
+        <h3 style="margin-top: 0; margin-bottom: 12px;">🔴 Live Incident Map</h3>
+        <!-- Locate this line in your HTML and update it to match this exactly 👇 -->
+<div id="adminMap" style="height: 500px; width: 100%; border-radius: var(--radius); z-index: 1; border: 1px solid #e0e0e0;"></div>
+      </div>
+    </div>
+
+    <div data-tab="users" class="tab-panel" style="display:none;">
+      <div class="card" style="margin-bottom:16px;">
+        <h3>Create Authority Account</h3>
+        <div class="grid grid-3">
+          <div class="field"><label>Name</label><input class="input" id="newName" /></div>
+          <div class="field"><label>Email</label><input class="input" id="newEmail" type="email" /></div>
+          <div class="field"><label>Password</label><input class="input" id="newPassword" type="password" /></div>
+        </div>
+        <div class="grid grid-2">
+          <div class="field">
+            <label>Role</label>
+            <select class="input" id="newRole" onchange="toggleDeptField()">
+              <option value="authority">Authority (Department Staff)</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div class="field" id="deptField"><label>Department</label><select class="input" id="newDept"></select></div>
+        </div>
+        <button class="btn" onclick="createUser()">Create Account</button>
+      </div>
+      <div class="card">
+        <h3>All Accounts</h3>
+        <table>
+          <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Department</th><th>Points</th><th></th></tr></thead>
+          <tbody id="usersBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div data-tab="customize" class="tab-panel" style="display:none;">
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>Citizen Portal Tabs</h3>
+          <p style="color:var(--color-text-muted);font-size:13px;">Toggle which tabs citizens see in their portal.</p>
+          <div id="userTabToggles"></div>
+        </div>
+        <div class="card">
+          <h3>Authority Portal Tabs</h3>
+          <p style="color:var(--color-text-muted);font-size:13px;">Toggle which tabs department staff see in their portal.</p>
+          <div id="authorityTabToggles"></div>
+        </div>
+      </div>
+    </div>
+
+    <div data-tab="portals" class="tab-panel" style="display:none;">
+      <div class="card portal-link-card" style="margin-bottom:14px;">
+        <div><h3 style="margin:0;">👤 Citizen Portal</h3><p style="margin:4px 0 0;color:var(--color-text-muted);">Where residents report and track issues.</p></div>
+        <a class="btn secondary" href="/user/login.html" target="_blank">Open ↗</a>
+      </div>
+      <div class="card portal-link-card">
+        <div><h3 style="margin:0;">🛠️ Authority Portal</h3><p style="margin:4px 0 0;color:var(--color-text-muted);">Where department staff resolve assigned issues.</p></div>
+        <a class="btn secondary" href="/authority/login.html" target="_blank">Open ↗</a>
+      </div>
+    </div>
+  </div> </div> <script src="/shared/js/api.js"></script>
+<script src="/admin/js/app.js"></script>
+</body>
+</html>

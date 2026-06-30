@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Civic Platform - Authority Portal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="/shared/css/base.css" />
+
+<!-- 👇 LEAFLET MAP STYLESHEET 👇 -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+<style>
+  .modal-overlay { position: fixed; inset:0; background:rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; z-index: 50; }
+  .modal { background:#fff; border-radius: var(--radius); padding:22px; width: 420px; max-width:90vw; }
+  
+  /* 📊 Ensure map canvas plays nice with layouts and has explicit dimension constraints */
+  #issueMap {
+    height: 350px;
+    width: 100%;
+    border-radius: var(--radius, 8px);
+    margin-bottom: 20px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    z-index: 1; /* Keep map layers safely below header drop menus or modal overlays */
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <div class="sidebar" style="background:#0f2a1e;">
+    <div class="brand">🛠️ CivicConnect <small id="deptLabel">Authority Portal</small></div>
+    <div id="navItems"></div>
+    <div class="footer-link" onclick="logout('/authority/login.html')">⏻ Log out</div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <h1 id="pageTitle">Dashboard</h1>
+      <div class="user-chip"><span id="userName"></span></div>
+    </div>
+
+    <div data-tab="dashboard" class="tab-panel">
+      <div class="grid grid-3" id="dashStats"></div>
+    </div>
+
+    <div data-tab="assigned_issues" class="tab-panel" style="display:none;">
+      <div class="tabs">
+        <div class="tab-btn active" data-status="assigned" onclick="filterStatus('assigned')">New / Assigned</div>
+        <div class="tab-btn" data-status="in_progress" onclick="filterStatus('in_progress')">In Progress</div>
+        <div class="tab-btn" data-status="resolved" onclick="filterStatus('resolved')">Resolved</div>
+      </div>
+
+      <!-- 👇 MOUNT CANVAS INSIDE TARGET WORKSPACE 👇 -->
+      <div id="issueMap"></div>
+
+      <div id="issueList"></div>
+    </div>
+
+    <div data-tab="department_analytics" class="tab-panel" style="display:none;">
+      <div class="card">
+        <h3>Department Performance</h3>
+        <div class="grid grid-3" id="analyticsStats"></div>
+      </div>
+    </div>
+
+    <div data-tab="profile" class="tab-panel" style="display:none;">
+      <div class="card" style="max-width:420px;">
+        <h3 id="profileName"></h3>
+        <p id="profileDept" style="color:var(--color-text-muted);"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="resolveModal" style="display:none;">
+  <div class="modal">
+    <h3>Mark Issue Resolved</h3>
+    <div class="field"><label>Upload Repaired/Resolved Photo</label><input type="file" id="resolveFile" accept="image/*" class="input" /></div>
+    <div class="field"><label>Resolution Note (optional)</label><textarea class="input" id="resolveNote" rows="2"></textarea></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn secondary" onclick="closeResolveModal()">Cancel</button>
+      <button class="btn success" onclick="confirmResolve()">Submit Resolution</button>
+    </div>
+  </div>
+</div>
+
+<!-- 👇 LEAFLET INTERACTIVE RUNTIME SCRIPTS 👇 -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<script src="/shared/js/api.js"></script>
+<script src="/authority/js/app.js"></script>
+</body>
+</html>
