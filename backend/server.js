@@ -37,13 +37,17 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok', time: new Date().t
 
 // ---- Three separate static frontend portals, all served from this one backend ----
 // Admin portal (this server's "home" - also where admin links out to the other two)
-app.use('/admin', express.static(path.join(__dirname, '..', 'frontend', 'admin')));
+// ---- Three separate static frontend portals, all served from this one backend ----
+const rootDir = process.cwd();
+
+// Admin portal
+app.use('/admin', express.static(path.join(rootDir, 'frontend', 'admin')));
 // Citizen-facing reporting portal
-app.use('/user', express.static(path.join(__dirname, '..', 'frontend', 'user')));
+app.use('/user', express.static(path.join(rootDir, 'frontend', 'user')));
 // Authority/department portal
-app.use('/authority', express.static(path.join(__dirname, '..', 'frontend', 'authority')));
-// Shared assets (common css/js used by more than one portal, if any)
-app.use('/shared', express.static(path.join(__dirname, '..', 'frontend', 'shared')));
+app.use('/authority', express.static(path.join(rootDir, 'frontend', 'authority')));
+// Shared assets (where this api.js file lives!)
+app.use('/shared', express.static(path.join(rootDir, 'frontend', 'shared')));
 
 app.get('/', (req, res) => res.redirect('/admin'));
 
