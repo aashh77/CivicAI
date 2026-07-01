@@ -5,6 +5,8 @@ CivicAI is a production-ready, full-stack civic infrastructure management framew
 
 By unifying multimodal computer vision, semantic routing, predictive service-level agreements (SLAs), and automated background workers, CivicAI transforms raw civic complaints into validated, structurally isolated, and time-bound operational tickets.
 
+Live Demo: https://civic-ai-beige.vercel.app/
+
 ---
 
 ## 1. Core Problem Statement & Challenge
