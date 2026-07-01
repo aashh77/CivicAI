@@ -19,11 +19,11 @@ async function compressImageToBase64(buffer, {
     .jpeg({ quality })
     .toBuffer();
 
+  // OPTIMIZED FOR VERCEL: Re-compress the downscaled outputBuffer 
+  // instead of rebuilding from the massive original buffer.
   while (outputBuffer.length / 1024 > maxKB && quality > 25) {
-    quality -= 10;
-    outputBuffer = await sharp(buffer)
-      .rotate()
-      .resize({ width: maxDimension, height: maxDimension, fit: 'inside', withoutEnlargement: true })
+    quality -= 15; // Decrement faster to save serverless CPU cycles
+    outputBuffer = await sharp(outputBuffer) 
       .jpeg({ quality })
       .toBuffer();
   }

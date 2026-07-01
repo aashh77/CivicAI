@@ -58,24 +58,24 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
-app.listen(PORT, async () => {
-  console.log(`Civic Issue Platform backend running on port ${PORT}`);
-  console.log(`  Admin portal:     http://localhost:${PORT}/admin`);
-  console.log(`  Citizen portal:   http://localhost:${PORT}/user`);
-  console.log(`  Authority portal: http://localhost:${PORT}/authority`);
+// ---- REPLACE EVERYTHING BELOW YOUR UNHANDLED ERROR MIDDLEWARE WITH THIS ----
+
+// Only run app.listen if running locally, otherwise export for Vercel serverless
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Server running locally on port ${PORT}...`);
+  });
+}
+
+// Automatically trigger your escalation worker function when the backend wakes up
+setTimeout(async () => {
   try {
-    await bootstrap();
-    console.log('Initializing SLA Deadline Monitoring Worker Engine...');
-    
-    // Run an initial sweep immediately on startup
+    console.log("Starting proactive escalation sweep...");
     await checkAndEscalateIssues();
-    
-    // Set up a loop to automatically run the sweep every 60 minutes
-    const ONE_HOUR_MS = 60 * 60 * 1000;
-    setInterval(async () => {
-      await checkAndEscalateIssues();
-    }, ONE_HOUR_MS);
+    console.log("Escalation sweep completed successfully.");
   } catch (err) {
-    console.error('Startup bootstrap failed (server still running):', err.message);
+    console.error("Worker sweep failed:", err);
   }
-});
+}, 1000);
+
+module.exports = app;
