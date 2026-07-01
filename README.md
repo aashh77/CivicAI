@@ -190,3 +190,43 @@ The worker targets any ticket with an active state (`assigned` or `in_progress`)
 * **Accessible Voice-to-Ticket Portals:** Integrating cloud-native speech-to-text models and automated telephonic IVR routes to allow elderly, non-technical, or visually impaired citizens to register valid issues via native voice dialogue.
 * **Automated Third-Party Vendor Dispatches:** Building automated B2B procurement and routing workflows that algorithmically dispatch overdue or specialized issues to external private contractors based on geographic proximity, active bidding tables, and live capacity indexes.
 * **Offline-First PWA Synchronization:** Packaging the Frontend Citizen Portal with service workers and local storage state sync to enable rural reporting in network-dead zones, automatically firing the ingestion pipeline the moment cellular signal is recovered.
+
+
+## Default Test Accounts & Credentials
+
+**Global Password for All Accounts: pass**
+
+1. Central Administrator
+Use this account to access the overarching administrative control panel.
+Email: admin@city.gov
+Role: Central Admin
+
+
+2. Department Authorities
+Use these accounts to test the backend routing, department-specific dashboards, and issue management.
+* Roads & Potholes Department
+Email: roads@city.gov
+Department ID: roads
+
+* Water Supply Department
+Email: water@city.gov
+Department ID: water
+
+* Streetlight & Electrical Department
+Email: light@city.gov
+Department ID: electrical
+
+* Waste Management / Sanitation Department
+Email: sanitation@city.gov
+Department ID: sanitation
+
+* General Public Works
+Email: publicworks@city.gov
+Department ID: public_works
+
+3. Citizens
+Use these accounts to log into the main user/citizen facing portal to submit issues, view tracking, or test user profiles.
+* Citizen1
+Email: citizen1@test.com
+* Citizen2
+Email: citizen2@test.com
